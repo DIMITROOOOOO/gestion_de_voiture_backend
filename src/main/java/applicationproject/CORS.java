@@ -1,6 +1,6 @@
 package applicationproject;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.NonNull; // Add this import
+import org.springframework.lang.NonNull; 
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -8,11 +8,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CORS implements WebMvcConfigurer {
 
     @Override
-    public void addCorsMappings(@NonNull CorsRegistry registry) { // Add @NonNull here
-        registry.addMapping("/api/**") // Allow CORS for all endpoints under /api
-                .allowedOrigins("http://localhost:4200") // Allow requests from Angular app
-                .allowedMethods("GET", "POST", "PUT", "DELETE","OPTIONS") // Allow specific HTTP methods
-                .allowedHeaders("*") // Allow all headers
-                .allowCredentials(true); // Allow credentials (e.g., cookies)
+    public void addCorsMappings(@NonNull CorsRegistry registry) { 
+        registry.addMapping("/api/**") 
+                .allowedOrigins("http://localhost:4200")
+                .allowedMethods("GET", "POST", "PUT", "DELETE","OPTIONS")
+                .allowedHeaders("*") 
+                .allowCredentials(true);
     }
 }
