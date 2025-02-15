@@ -2,7 +2,7 @@ package applicationproject.entity;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import applicationproject.enums.*;
 import jakarta.persistence.CascadeType;
@@ -40,7 +40,7 @@ public class Modele {
     private typeBoiteVitesse typeBoiteVitesse;
 
     @OneToMany(mappedBy = "modele", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonBackReference
+    @JsonIgnore
     private List<vehicules> vehicules;
 
 

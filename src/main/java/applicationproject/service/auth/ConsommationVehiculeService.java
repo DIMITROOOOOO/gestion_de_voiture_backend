@@ -1,5 +1,6 @@
 package applicationproject.service.auth;
 
+import applicationproject.dto.ConsommationDTO;
 import applicationproject.dto.ConsommationVehiculeDTO;
 import applicationproject.entity.ConsommationVehicule;
 import applicationproject.entity.vehicules;
@@ -23,18 +24,10 @@ public class ConsommationVehiculeService {
     private ConsommationVehiculeRepository consommationVehiculeRepository;
 
     public List<ConsommationVehiculeDTO> getConsommationByPlaqueImmatriculation(String plaqueImmatriculation) {
-        // Fetch the vehicule by plaque_immatriculation
         Optional<vehicules> optionalVehicule = vehiculeRepository.findByPlaqueImmatriculation(plaqueImmatriculation);
-
-        // Throw an exception if the vehicule is not found
         vehicules vehicule = optionalVehicule.orElseThrow(() -> 
-            new RuntimeException("Vehicule not found with plaque_immatriculation: " + plaqueImmatriculation)
-        );
-
-        // Fetch consommation details using vehicule_id
+            new RuntimeException("Vehicule no trouvee " + plaqueImmatriculation));
         List<ConsommationVehicule> consommationVehicules = consommationVehiculeRepository.findByVehicule_VehiculeId(vehicule.getVehiculeId());
-
-        // Convert entities to DTOs
         return consommationVehicules.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -49,24 +42,23 @@ public class ConsommationVehiculeService {
         return dto;
     }
     public ConsommationVehiculeDTO addConsommationVehicule(ConsommationVehiculeDTO request) {
-        // Fetch the vehicule by plaque_immatriculation
         Optional<vehicules> optionalVehicule = vehiculeRepository.findByPlaqueImmatriculation(request.getPlaqueImmatriculation());
         vehicules vehicule = optionalVehicule.orElseThrow(() -> 
             new RuntimeException("Vehicule not found with plaque_immatriculation: " + request.getPlaqueImmatriculation())
         );
 
-        // Create a new ConsommationVehicule entity
         ConsommationVehicule consommationVehicule = new ConsommationVehicule();
         consommationVehicule.setVehicule(vehicule);
         consommationVehicule.setDateConsommation(request.getDateConsommation());
         consommationVehicule.setQuantiteConsommee(request.getQuantiteConsommee());
         consommationVehicule.setMontantDepense(request.getMontantDepense());
 
-        // Save the new consommation record
         ConsommationVehicule savedConsommationVehicule = consommationVehiculeRepository.save(consommationVehicule);
 
-        // Convert the saved entity to DTO and return it
         return convertToDTO(savedConsommationVehicule);
+    }
+    public List<ConsommationDTO> getTotalConsommationFeesByVehicule() {
+        return consommationVehiculeRepository.findTotalMontantDepenseByVehicule();
     }
 
    

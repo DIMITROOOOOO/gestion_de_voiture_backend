@@ -12,6 +12,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import applicationproject.enums.etat;
+import applicationproject.enums.nature;
 import applicationproject.enums.statut;
 
 @Service
@@ -72,6 +73,9 @@ public class MaintenanceService {
 
     public void deleteMaintenance(int id) {
         maintenanceRepository.deleteById(id);
+    }
+    public List<Maintenance> getMaintenancesByNature(nature nature) {
+        return maintenanceRepository.findByNature(nature);
     }
 
 }

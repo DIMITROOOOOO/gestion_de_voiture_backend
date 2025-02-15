@@ -1,20 +1,45 @@
 package applicationproject.service.auth;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
 import applicationproject.enums.*;
+import applicationproject.dto.DateIntervalDTO;
 import applicationproject.dto.VehiculeFeesResponse;
+import applicationproject.entity.Assurance;
+import applicationproject.entity.Modele;
+import applicationproject.entity.Taxe;
+import applicationproject.entity.Vignette;
 import applicationproject.entity.vehicules;
+import applicationproject.reposatory.AssuranceRepository;
+import applicationproject.reposatory.TaxeRepository;
 import applicationproject.reposatory.VehiculeRepository;
+import applicationproject.reposatory.VignetteRepository;
+import applicationproject.reposatory.modeleRepository;
 
 @Service
 public class VehiculesService {
 
-    @Autowired
-    private VehiculeRepository vehiculesRepository;
+    private final VehiculeRepository vehiculesRepository;
+    private final modeleRepository modeleRepository;
+    private final AssuranceRepository assuranceRepository;
+    private final VignetteRepository vignetteRepository;
+    private final TaxeRepository taxeRepository;
+
+    public VehiculesService(
+        VehiculeRepository vehiculesRepository,
+        modeleRepository modeleRepository,
+        AssuranceRepository assuranceRepository,
+        VignetteRepository vignetteRepository,
+        TaxeRepository taxeRepository
+    ) {
+        this.vehiculesRepository = vehiculesRepository;
+        this.modeleRepository = modeleRepository;
+        this.assuranceRepository = assuranceRepository;
+        this.vignetteRepository = vignetteRepository;
+        this.taxeRepository = taxeRepository;
+    }
 
     public vehicules createVehicule(vehicules vehicule) {
         return vehiculesRepository.save(vehicule);
@@ -29,22 +54,44 @@ public class VehiculesService {
     }
 
     public vehicules updateVehicule(int vehiculeId, vehicules updatedVehicule) {
-        vehicules existingVehicule = vehiculesRepository.findById(vehiculeId).orElse(null);
-        if (existingVehicule != null) {
-            existingVehicule.setPlaque_immatriculation(updatedVehicule.getPlaque_immatriculation());
-            existingVehicule.setKilometrage(updatedVehicule.getKilometrage());
-            existingVehicule.setDateMiseEnCirculation(updatedVehicule.getDateMiseEnCirculation());
-            existingVehicule.setTypeCarburant(updatedVehicule.getTypeCarburant());
-            existingVehicule.setConsommation(updatedVehicule.getConsommation());
-            existingVehicule.setStatut(updatedVehicule.getStatut());
-            existingVehicule.setModele(updatedVehicule.getModele());
-            existingVehicule.setVignette(updatedVehicule.getVignette());
-            existingVehicule.setAssurance(updatedVehicule.getAssurance());
-            existingVehicule.setTaxe(updatedVehicule.getTaxe());
-            return vehiculesRepository.save(existingVehicule);
+        vehicules existingVehicule = vehiculesRepository.findById(vehiculeId)
+                .orElseThrow(() -> new RuntimeException("Vehicule not found with ID: " + vehiculeId));
+    
+        existingVehicule.setPlaque_immatriculation(updatedVehicule.getPlaque_immatriculation());
+        existingVehicule.setKilometrage(updatedVehicule.getKilometrage());
+        existingVehicule.setDateMiseEnCirculation(updatedVehicule.getDateMiseEnCirculation());
+        existingVehicule.setTypeCarburant(updatedVehicule.getTypeCarburant());
+        existingVehicule.setConsommation(updatedVehicule.getConsommation());
+        existingVehicule.setStatut(updatedVehicule.getStatut());
+    
+        if (updatedVehicule.getModele() != null) {
+            Modele existingModele = modeleRepository.findByMarqueAndModele(
+                    updatedVehicule.getModele().getMarque(), updatedVehicule.getModele().getModele())
+                    .orElseGet(() -> modeleRepository.save(updatedVehicule.getModele()));
+            existingVehicule.setModele(existingModele);
         }
-        return null;
+    
+        if (updatedVehicule.getAssurance() != null) {
+            Assurance existingAssurance = assuranceRepository.findByIdAssurance(updatedVehicule.getAssurance().getIdAssurance())
+                    .orElseGet(() -> assuranceRepository.save(updatedVehicule.getAssurance()));
+            existingVehicule.setAssurance(existingAssurance);
+        }
+    
+        if (updatedVehicule.getVignette() != null) {
+            Vignette existingVignette = vignetteRepository.findByNumeroVignette(updatedVehicule.getVignette().getNumeroVignette())
+                    .orElseGet(() -> vignetteRepository.save(updatedVehicule.getVignette()));
+            existingVehicule.setVignette(existingVignette);
+        }
+    
+        if (updatedVehicule.getTaxe() != null) {
+            Taxe existingTaxe = taxeRepository.findByCodeTaxe(updatedVehicule.getTaxe().getCodeTaxe())
+                    .orElseGet(() -> taxeRepository.save(updatedVehicule.getTaxe()));
+            existingVehicule.setTaxe(existingTaxe);
+        }
+    
+        return vehiculesRepository.save(existingVehicule);
     }
+    
 
     public void deleteVehicule(int vehiculeId) {
         vehiculesRepository.deleteById(vehiculeId);
@@ -82,10 +129,17 @@ public class VehiculesService {
         Optional<vehicules> vehiculeOptional = vehiculesRepository.findByPlaqueImmatriculation(plaqueImmatriculation);
 
         if (vehiculeOptional.isEmpty()) {
-            throw new RuntimeException("Vehicle not found with license plate: " + plaqueImmatriculation);
+            throw new RuntimeException("Vehicle no trouvee: " + plaqueImmatriculation);
         }
 
         vehicules vehicule = vehiculeOptional.get();
         return vehicule.calculateFeesSeparately();
+    }
+    public List<vehicules> getVehiculesByAssuranceExpirationDateBetween(DateIntervalDTO dateInterval) {
+        return vehiculesRepository.findVehiculesByAssuranceExpirationDateBetween(dateInterval.getDateDebut(), dateInterval.getDateFin());
+    }
+
+    public List<vehicules> getVehiculesByVignetteExpirationDateBetween(DateIntervalDTO dateInterval) {
+        return vehiculesRepository.findVehiculesByVignetteExpirationDateBetween(dateInterval.getDateDebut(), dateInterval.getDateFin());
     }
 }

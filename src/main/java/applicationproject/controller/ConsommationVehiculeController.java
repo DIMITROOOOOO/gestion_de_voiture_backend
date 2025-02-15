@@ -1,5 +1,6 @@
 package applicationproject.controller;
 
+import applicationproject.dto.ConsommationDTO;
 import applicationproject.dto.ConsommationVehiculeDTO;
 import applicationproject.service.auth.ConsommationVehiculeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,4 +28,8 @@ public class ConsommationVehiculeController {
     public ConsommationVehiculeDTO addConsommationVehicule(@RequestBody ConsommationVehiculeDTO request) {
         return consommationVehiculeService.addConsommationVehicule(request);
     }
+    @GetMapping("/total-consommation-fees")
+    public List<ConsommationDTO> getTotalConsommationFeesByVehicule() {
+    return consommationVehiculeService.getTotalConsommationFeesByVehicule();
+}
 }

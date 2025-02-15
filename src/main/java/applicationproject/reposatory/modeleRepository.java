@@ -9,7 +9,7 @@ import applicationproject.entity.Modele;
 public interface modeleRepository extends JpaRepository<Modele, Integer> {
 
     List<Modele> findByMarque(String marque);
-
+    Optional<Modele> findByMarqueAndModele(String marque, String modele);
     Optional<Modele> findById(int id);
 
     @SuppressWarnings("null")

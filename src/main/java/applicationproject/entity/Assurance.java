@@ -3,7 +3,7 @@ package applicationproject.entity;
 import java.sql.Date;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -44,11 +44,11 @@ public class Assurance {
     private float coutAssurance; 
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "typeContrat", nullable = false,columnDefinition = "ENUM('annuel','trimestre','semestre')")  
+    @Column(name = "typeContrat", nullable = false,columnDefinition = "ENUM('assurance_tous_risques','assurance_contre_vol','assurance_personnelle_contre_les_accidents')")  
     private typeContrat typeContrat; 
 
     @OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonBackReference
+    @JsonIgnore
     private List<vehicules> vehicules;
 
 }

@@ -1,5 +1,6 @@
 package applicationproject.controller;
 
+import applicationproject.dto.DateIntervalDTO;
 import applicationproject.dto.VehicleDTO;
 import applicationproject.dto.VehiculeFeesResponse;
 import applicationproject.entity.vehicules;
@@ -50,19 +51,16 @@ public class VehiculeController {
 
     @PostMapping
     public ResponseEntity<vehicules> createVehicule(@RequestBody VehicleDTO vehicleDTO) {
-        // Convert DTOs to Entities
         var modele = vehicleDTO.getModele().toEntity();
         var vignette = vehicleDTO.getVignette().toEntity();
         var assurance = vehicleDTO.getAssurance().toEntity();
         var taxe = vehicleDTO.getTaxe().toEntity();
 
-        // Save associated entities
         var savedModele = modeleService.createModele(modele);
         var savedVignette = vignetteService.createVignette(vignette);
         var savedAssurance = assuranceService.createAssurance(assurance);
         var savedTaxe = taxeService.createTaxe(taxe);
 
-        // Create and save Vehicule
         vehicules vehicule = new vehicules();
         vehicule.setPlaque_immatriculation(vehicleDTO.getPlaque_immatriculation());
         vehicule.setKilometrage(vehicleDTO.getKilometrage());
@@ -93,5 +91,14 @@ public class VehiculeController {
      @GetMapping("/fees/{plaqueImmatriculation}")
     public VehiculeFeesResponse getFeesByImmatriculation(@PathVariable String plaqueImmatriculation) {
         return vehiculeService.getFeesByImmatriculation(plaqueImmatriculation);
+    }
+      @PostMapping("/by-assurance-expiration")
+    public List<vehicules> getVehiculesByAssuranceExpiration(@RequestBody DateIntervalDTO dateInterval) {
+        return vehiculeService.getVehiculesByAssuranceExpirationDateBetween(dateInterval);
+    }
+
+    @PostMapping("/by-vignette-expiration")
+    public List<vehicules> getVehiculesByVignetteExpiration(@RequestBody DateIntervalDTO dateInterval) {
+        return vehiculeService.getVehiculesByVignetteExpirationDateBetween(dateInterval);
     }
 }

@@ -2,6 +2,7 @@ package applicationproject.controller;
 
 import applicationproject.dto.MaintenanceRequest;
 import applicationproject.entity.Maintenance;
+import applicationproject.enums.nature;
 import applicationproject.service.auth.MaintenanceService;
 import lombok.RequiredArgsConstructor;
 
@@ -54,5 +55,10 @@ public class MaintenanceController {
     public ResponseEntity<Void> deleteMaintenance(@PathVariable int id) {
         maintenanceService.deleteMaintenance(id);
         return ResponseEntity.noContent().build();
+    }
+     @GetMapping("/by-nature")
+    public ResponseEntity<List<Maintenance>> getMaintenancesByNature(@RequestParam nature nature) {
+        List<Maintenance> maintenances = maintenanceService.getMaintenancesByNature(nature);
+        return ResponseEntity.ok(maintenances);
     }
 }

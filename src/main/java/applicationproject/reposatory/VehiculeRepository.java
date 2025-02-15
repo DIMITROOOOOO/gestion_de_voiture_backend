@@ -1,5 +1,6 @@
 package applicationproject.reposatory;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +20,9 @@ public interface VehiculeRepository extends JpaRepository<vehicules, Integer>{
      List<vehicules> findByModele_Marque(String marque);
      List<vehicules> findByAssurance_TypeContrat(typeContrat typeContrat);
      List<vehicules> findByModele_TypeVehicle(typeVehicle type);
+     @Query("SELECT v FROM vehicules v WHERE v.assurance.dateExpiration BETWEEN :dateDebut AND :dateFin")
+    List<vehicules> findVehiculesByAssuranceExpirationDateBetween(@Param("dateDebut") Date dateDebut, @Param("dateFin") Date dateFin);
+    
+    @Query("SELECT v FROM vehicules v WHERE v.vignette.dateExpiration BETWEEN :dateDebut AND :dateFin")
+    List<vehicules> findVehiculesByVignetteExpirationDateBetween(@Param("dateDebut") Date dateDebut, @Param("dateFin") Date dateFin);
 }   
